@@ -16,7 +16,7 @@ describe('ScheduledServicesService', () => {
   const mockScheduledServiceRepository = {
     create: jest.fn(),
     save: jest.fn(),
-    find: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     remove: jest.fn(),
   };
@@ -119,7 +119,7 @@ describe('ScheduledServicesService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of scheduled services with relations', async () => {
+    it('should return paginated scheduled services with relations', async () => {
       const mockServices = [
         {
           id: 1,
@@ -131,14 +131,23 @@ describe('ScheduledServicesService', () => {
         },
       ];
 
-      mockScheduledServiceRepository.find.mockResolvedValue(mockServices);
+      mockScheduledServiceRepository.findAndCount.mockResolvedValue([mockServices, 1]);
 
       const result = await service.findAll();
 
-      expect(mockScheduledServiceRepository.find).toHaveBeenCalledWith({
+      expect(mockScheduledServiceRepository.findAndCount).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        order: { id: 'DESC' },
         relations: ['service'],
       });
-      expect(result).toEqual(mockServices);
+      expect(result).toEqual({
+        data: mockServices,
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
     });
   });
 

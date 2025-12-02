@@ -14,7 +14,7 @@ describe('ServicesService', () => {
   const mockRepository = {
     create: jest.fn(),
     save: jest.fn(),
-    find: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     remove: jest.fn(),
   };
@@ -66,18 +66,28 @@ describe('ServicesService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of services', async () => {
+    it('should return paginated services', async () => {
       const mockServices = [
         { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
         { id: 2, name: 'Beard Trim', durationTimeMinutes: 15 },
       ];
 
-      mockRepository.find.mockResolvedValue(mockServices);
+      mockRepository.findAndCount.mockResolvedValue([mockServices, 2]);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 10);
 
-      expect(mockRepository.find).toHaveBeenCalled();
-      expect(result).toEqual(mockServices);
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        order: { id: 'DESC' },
+      });
+      expect(result).toEqual({
+        data: mockServices,
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
     });
   });
 
