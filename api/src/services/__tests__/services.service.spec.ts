@@ -6,6 +6,7 @@ import { ServicesService } from '../services.service';
 import { Service } from '../entities/service.entity';
 import { CreateServiceDto } from '../dto/create-service.dto';
 import { UpdateServiceDto } from '../dto/update-service.dto';
+import { ServiceBuilder } from './service.builder';
 
 describe('ServicesService', () => {
   let service: ServicesService;
@@ -44,15 +45,16 @@ describe('ServicesService', () => {
 
   describe('create', () => {
     it('should create a new service', async () => {
-      const createServiceDto: CreateServiceDto = {
-        name: 'Haircut',
-        durationTimeMinutes: 30,
-      };
+      const createServiceDto: CreateServiceDto = new ServiceBuilder()
+        .withName('Haircut')
+        .withDuration(30)
+        .buildCreateDto();
 
-      const mockService = {
-        id: 1,
-        ...createServiceDto,
-      };
+      const mockService = new ServiceBuilder()
+        .withId(1)
+        .withName('Haircut')
+        .withDuration(30)
+        .build();
 
       mockRepository.create.mockReturnValue(mockService);
       mockRepository.save.mockResolvedValue(mockService);
@@ -68,8 +70,8 @@ describe('ServicesService', () => {
   describe('findAll', () => {
     it('should return paginated services', async () => {
       const mockServices = [
-        { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-        { id: 2, name: 'Beard Trim', durationTimeMinutes: 15 },
+        new ServiceBuilder().withId(1).withName('Haircut').withDuration(30).build(),
+        new ServiceBuilder().withId(2).withName('Beard Trim').withDuration(15).build(),
       ];
 
       mockRepository.findAndCount.mockResolvedValue([mockServices, 2]);
@@ -93,7 +95,7 @@ describe('ServicesService', () => {
 
   describe('findOne', () => {
     it('should return a service by id', async () => {
-      const mockService = { id: 1, name: 'Haircut', durationTimeMinutes: 30 };
+      const mockService = new ServiceBuilder().withId(1).withName('Haircut').build();
 
       mockRepository.findOne.mockResolvedValue(mockService);
 
@@ -120,12 +122,16 @@ describe('ServicesService', () => {
         durationTimeMinutes: 45,
       };
 
-      const existingService = {
-        id: 1,
-        name: 'Haircut',
-        durationTimeMinutes: 30,
-      };
-      const updatedService = { id: 1, ...updateServiceDto };
+      const existingService = new ServiceBuilder()
+        .withId(1)
+        .withName('Haircut')
+        .withDuration(30)
+        .build();
+      const updatedService = new ServiceBuilder()
+        .withId(1)
+        .withName('Premium Haircut')
+        .withDuration(45)
+        .build();
 
       mockRepository.findOne.mockResolvedValue(existingService);
       mockRepository.save.mockResolvedValue(updatedService);
@@ -150,7 +156,7 @@ describe('ServicesService', () => {
 
   describe('remove', () => {
     it('should remove a service', async () => {
-      const mockService = { id: 1, name: 'Haircut', durationTimeMinutes: 30 };
+      const mockService = new ServiceBuilder().withId(1).withName('Haircut').build();
 
       mockRepository.findOne.mockResolvedValue(mockService);
       mockRepository.remove.mockResolvedValue(mockService);

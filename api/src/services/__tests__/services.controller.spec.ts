@@ -4,6 +4,7 @@ import { ServicesService } from '../services.service';
 import { CreateServiceDto } from '../dto/create-service.dto';
 import { UpdateServiceDto } from '../dto/update-service.dto';
 import { Service } from '../entities/service.entity';
+import { ServiceBuilder } from './service.builder';
 
 describe('ServicesController', () => {
   let controller: ServicesController;
@@ -42,16 +43,16 @@ describe('ServicesController', () => {
 
   describe('create', () => {
     it('should create a service', async () => {
-      const createServiceDto: CreateServiceDto = {
-        name: 'Haircut',
-        durationTimeMinutes: 30,
-      };
+      const createServiceDto: CreateServiceDto = new ServiceBuilder()
+        .withName('Haircut')
+        .withDuration(30)
+        .buildCreateDto();
 
-      const expectedResult: Service = {
-        id: 1,
-        ...createServiceDto,
-        scheduledServices: [],
-      };
+      const expectedResult: Service = new ServiceBuilder()
+        .withId(1)
+        .withName('Haircut')
+        .withDuration(30)
+        .build();
 
       mockServicesService.create.mockResolvedValue(expectedResult);
 
@@ -65,8 +66,8 @@ describe('ServicesController', () => {
   describe('findAll', () => {
     it('should return an array of services', async () => {
       const expectedResult: Service[] = [
-        { id: 1, name: 'Haircut', durationTimeMinutes: 30, scheduledServices: [] },
-        { id: 2, name: 'Beard Trim', durationTimeMinutes: 15, scheduledServices: [] },
+        new ServiceBuilder().withId(1).withName('Haircut').withDuration(30).build(),
+        new ServiceBuilder().withId(2).withName('Beard Trim').withDuration(15).build(),
       ];
 
       mockServicesService.findAll.mockResolvedValue(expectedResult);
@@ -80,12 +81,11 @@ describe('ServicesController', () => {
 
   describe('findOne', () => {
     it('should return a single service', async () => {
-      const expectedResult: Service = {
-        id: 1,
-        name: 'Haircut',
-        durationTimeMinutes: 30,
-        scheduledServices: [],
-      };
+      const expectedResult: Service = new ServiceBuilder()
+        .withId(1)
+        .withName('Haircut')
+        .withDuration(30)
+        .build();
 
       mockServicesService.findOne.mockResolvedValue(expectedResult);
 
@@ -103,12 +103,11 @@ describe('ServicesController', () => {
         durationTimeMinutes: 45,
       };
 
-      const expectedResult: Service = {
-        id: 1,
-        name: 'Premium Haircut',
-        durationTimeMinutes: 45,
-        scheduledServices: [],
-      };
+      const expectedResult: Service = new ServiceBuilder()
+        .withId(1)
+        .withName('Premium Haircut')
+        .withDuration(45)
+        .build();
 
       mockServicesService.update.mockResolvedValue(expectedResult);
 

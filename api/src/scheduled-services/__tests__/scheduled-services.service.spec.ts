@@ -7,6 +7,8 @@ import { ScheduledService } from '../entities/scheduled-service.entity';
 import { Service } from '../../services/entities/service.entity';
 import { CreateScheduledServiceDto } from '../dto/create-scheduled-service.dto';
 import { UpdateScheduledServiceDto } from '../dto/update-scheduled-service.dto';
+import { ScheduledServiceBuilder } from './scheduled-services.builder';
+import { ServiceBuilder } from '../../services/__tests__/service.builder';
 
 describe('ScheduledServicesService', () => {
   let service: ScheduledServicesService;
@@ -59,29 +61,15 @@ describe('ScheduledServicesService', () => {
 
   describe('create', () => {
     it('should create a new scheduled service', async () => {
-      const createDto: CreateScheduledServiceDto = {
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        serviceId: 1,
-      };
+      const mockService: Service = new ServiceBuilder().withId(1).withName('Haircut').build();
+      const createDto: CreateScheduledServiceDto = new ScheduledServiceBuilder()
+        .withService(mockService)
+        .buildCreateDto(1);
 
-      const mockService: Service = {
-        id: 1,
-        name: 'Haircut',
-        durationTimeMinutes: 30,
-        scheduledServices: [],
-      };
-
-      const mockScheduledService = {
-        id: 1,
-        serviceDate: createDto.serviceDate,
-        scheduledHour: createDto.scheduledHour,
-        clientName: createDto.clientName,
-        clientPhone: createDto.clientPhone,
-        service: mockService,
-      };
+      const mockScheduledService = new ScheduledServiceBuilder()
+        .withId(1)
+        .withService(mockService)
+        .build();
 
       mockServiceRepository.findOne.mockResolvedValue(mockService);
       mockScheduledServiceRepository.create.mockReturnValue(mockScheduledService);
@@ -120,16 +108,7 @@ describe('ScheduledServicesService', () => {
 
   describe('findAll', () => {
     it('should return paginated scheduled services with relations', async () => {
-      const mockServices = [
-        {
-          id: 1,
-          serviceDate: new Date('2025-12-15'),
-          scheduledHour: '14:30',
-          clientName: 'John Doe',
-          clientPhone: '123-456-7890',
-          service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-        },
-      ];
+      const mockServices = [new ScheduledServiceBuilder().withId(1).build()];
 
       mockScheduledServiceRepository.findAndCount.mockResolvedValue([mockServices, 1]);
 
@@ -153,14 +132,7 @@ describe('ScheduledServicesService', () => {
 
   describe('findOne', () => {
     it('should return a scheduled service by id with relations', async () => {
-      const mockScheduledService = {
-        id: 1,
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-      };
+      const mockScheduledService = new ScheduledServiceBuilder().withId(1).build();
 
       mockScheduledServiceRepository.findOne.mockResolvedValue(mockScheduledService);
 
@@ -190,19 +162,17 @@ describe('ScheduledServicesService', () => {
         scheduledHour: '15:00',
       };
 
-      const existingScheduledService = {
-        id: 1,
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-      };
+      const existingScheduledService = new ScheduledServiceBuilder()
+        .withId(1)
+        .withClientName('John Doe')
+        .withScheduledHour('14:30')
+        .build();
 
-      const updatedScheduledService = {
-        ...existingScheduledService,
-        ...updateDto,
-      };
+      const updatedScheduledService = new ScheduledServiceBuilder()
+        .withId(1)
+        .withClientName('Jane Doe')
+        .withScheduledHour('15:00')
+        .build();
 
       mockScheduledServiceRepository.findOne.mockResolvedValue(existingScheduledService);
       mockScheduledServiceRepository.save.mockResolvedValue(updatedScheduledService);
@@ -219,21 +189,16 @@ describe('ScheduledServicesService', () => {
         serviceId: 2,
       };
 
-      const existingScheduledService = {
-        id: 1,
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-      };
+      const existingScheduledService = new ScheduledServiceBuilder()
+        .withId(1)
+        .withService(new ServiceBuilder().withId(1).withName('Haircut').build())
+        .build();
 
-      const newService: Service = {
-        id: 2,
-        name: 'Beard Trim',
-        durationTimeMinutes: 15,
-        scheduledServices: [],
-      };
+      const newService: Service = new ServiceBuilder()
+        .withId(2)
+        .withName('Beard Trim')
+        .withDuration(15)
+        .build();
 
       mockScheduledServiceRepository.findOne.mockResolvedValue(existingScheduledService);
       mockServiceRepository.findOne.mockResolvedValue(newService);
@@ -255,14 +220,7 @@ describe('ScheduledServicesService', () => {
         serviceId: 999,
       };
 
-      const existingScheduledService = {
-        id: 1,
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-      };
+      const existingScheduledService = new ScheduledServiceBuilder().withId(1).build();
 
       mockScheduledServiceRepository.findOne.mockResolvedValue(existingScheduledService);
       mockServiceRepository.findOne.mockResolvedValue(null);
@@ -286,14 +244,7 @@ describe('ScheduledServicesService', () => {
 
   describe('remove', () => {
     it('should remove a scheduled service', async () => {
-      const mockScheduledService = {
-        id: 1,
-        serviceDate: new Date('2025-12-15'),
-        scheduledHour: '14:30',
-        clientName: 'John Doe',
-        clientPhone: '123-456-7890',
-        service: { id: 1, name: 'Haircut', durationTimeMinutes: 30 },
-      };
+      const mockScheduledService = new ScheduledServiceBuilder().withId(1).build();
 
       mockScheduledServiceRepository.findOne.mockResolvedValue(mockScheduledService);
       mockScheduledServiceRepository.remove.mockResolvedValue(mockScheduledService);
