@@ -15,7 +15,7 @@ class TestScheduledServicePages(BaseTest):
 
         service_name = f"Servico Agenda {int(time.time())}"
 
-        # Create a service first (reusing the UI flow)
+        
         driver.get(base_url)
         wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(., 'Criar Serviço')]"))
@@ -37,7 +37,7 @@ class TestScheduledServicePages(BaseTest):
         except Exception:
             pass
 
-        # Go to booking page
+        
         wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(., 'Agendar')]"))
         ).click()
@@ -71,7 +71,7 @@ class TestScheduledServicePages(BaseTest):
             (By.XPATH, "//div[contains(@class,'modal-body')]//p[contains(., 'Agendamento confirmado')]"))
         )
 
-        # Wait for redirect to schedules page and assert the new appointment appears
+        
         wait.until(EC.presence_of_element_located(
             (By.XPATH, "//h2[contains(., 'Meus Agendamentos')]"))
         )
