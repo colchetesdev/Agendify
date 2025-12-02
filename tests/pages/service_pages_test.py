@@ -32,7 +32,7 @@ class TestServicePages(BaseTest):
             (By.XPATH, "//div[contains(@class,'modal-body')]//p[contains(., 'Serviço cadastrado')]"))
         )
 
-        # Optionally close the modal to unblock navigation
+       
         try:
             driver.find_element(By.XPATH, "//div[contains(@class,'modal-footer')]//button[contains(., 'OK')]").click()
         except Exception:
