@@ -1,0 +1,4 @@
+browser: chrome
+headless: true
+base_url: http://web:5173
+selenium_remote_url: http://selenium:4444/wd/hub
